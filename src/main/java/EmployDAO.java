@@ -11,6 +11,7 @@ public class EmployDAO {
     private static final String DELETE_EMPLOY_SQL = "delete from employment where id_employment = ?;";
     private static final String UPDATE_EMPLOY_SQL = "update employment set name_employment= ?,address= ?,email= ?,phone= ?,salary= ?,id_department= ? where id_employment = ?;";
     private static final String SELECT_EMPLOY_BY_ID = "select * from employment where id_employment=?";
+    private final String SELECT_BY_LIKE="select * from employment where name_employment like ?;";
     private DepartDAO departDAO;
 
     public EmployDAO() {
@@ -118,7 +119,31 @@ public class EmployDAO {
         }
         return listEmployment;
     }
-
+public List<Employ> selectEmployByName(String text){
+    List<Employ> listEmployment = new ArrayList<>();
+    try (Connection connection = getConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_LIKE) ){
+        String text1='%'+text+'%';
+        preparedStatement.setString(1, text1);
+        System.out.println(preparedStatement);
+        ResultSet rs = preparedStatement.executeQuery();
+        int stt = 0;
+        while (rs.next()) {
+            stt++;
+            int id = rs.getInt("id_employment");
+            String name = rs.getString("name_employment");
+            String address = rs.getString("address");
+            String email = rs.getString("email");
+            String phone = rs.getString("phone");
+            Double salary = rs.getDouble("salary");
+            int id_department = rs.getInt("id_department");
+            listEmployment.add(new Employ(stt, id, name, address, email, phone, salary, departDAO.selectDepartmentById(id_department)));
+        }
+    } catch (SQLException e) {
+        printSQLException(e);
+    }
+    return listEmployment;
+}
     private void printSQLException(SQLException ex) {
         for (Throwable e : ex) {
             if (e instanceof SQLException) {

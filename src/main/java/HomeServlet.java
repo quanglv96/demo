@@ -16,21 +16,12 @@ public class HomeServlet extends HttpServlet {
         if (action == null) {
             action = "";
         }
-        try {
             switch (action) {
-                case "deleteEmploy":
-                    deleteEmploy(request,response);
-                    break;
-                case "formEdit":
-                    formEdit(request, response);
-                    break;
                 default:
                     listEmployment(request, response);
                     break;
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+
     }
 
     @Override
@@ -41,13 +32,22 @@ public class HomeServlet extends HttpServlet {
         }
         try {
             switch (action) {
+                case "formEdit":
+                    formEdit(request, response);
+                    break;
+                case "deleteEmploy":
+                    deleteEmploy(request,response);
+                    break;
+                case "search":
+                    searchEmploy(request, response);
+                    break;
                 case "formAddEmploy":
                     formAddEmploy(request, response);
                     break;
-                case "addEmployment":
+                case "saveAdd":
                     addEmployment(request,response);
                     break;
-                case "save":
+                case "saveEdit":
                     saveForm(request, response);
                     break;
                 case "delete":
@@ -62,6 +62,14 @@ public class HomeServlet extends HttpServlet {
         int id= Integer.parseInt(request.getParameter("idEmploy"));
         employDAO.deleteEmploy(id);
         response.sendRedirect("http://localhost:8081/home");
+    }
+    private void searchEmploy(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException, ServletException {
+        String text = request.getParameter("search");
+        List<Employ> listEmploy = employDAO.selectEmployByName(text);
+        request.setAttribute("listEmployment", listEmploy);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("index.jsp");
+        dispatcher.forward(request, response);
     }
         private void addEmployment(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
        String name=request.getParameter("name");
@@ -111,7 +119,7 @@ public class HomeServlet extends HttpServlet {
         request.setAttribute("phoneEmploy", employ.getPhone());
         request.setAttribute("salaryEmploy", employ.getSalary());
         request.setAttribute("listDepartment", departList);
-        RequestDispatcher requestDispatcher = request.getRequestDispatcher("FormEdit.jsp");
+        RequestDispatcher requestDispatcher = request.getRequestDispatcher("editEmployment.jsp");
         requestDispatcher.forward(request, response);
     }
 }

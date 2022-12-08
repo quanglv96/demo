@@ -13,7 +13,7 @@
 </head>
 <body>
 <div align="center">
-  <form action="/home?action=save&idEmploy=${id}" method="post">
+  <form action="/home?action=saveEdit&idEmploy=${id}" method="post">
     <table>
       <tr>
         <th>Name:</th>
